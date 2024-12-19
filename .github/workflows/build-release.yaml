@@ -63,7 +63,8 @@ jobs:
 
     - name: Build VSIX file
       run: |
-        vsce package --out dist/blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
+        cd .\anko\
+        vsce package --allow-missing-repository --out ..\dist\blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
