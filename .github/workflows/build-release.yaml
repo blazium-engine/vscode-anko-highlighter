@@ -76,6 +76,8 @@ jobs:
   release:
     needs: build
     runs-on: windows-latest
+    permissions:
+      contents: write  # Grants write permissions for content operations
 
     steps:
     - name: Download artifact
