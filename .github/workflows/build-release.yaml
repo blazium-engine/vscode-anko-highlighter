@@ -10,7 +10,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
+    outputs:
+      version: ${{ steps.validate.outputs.newVersion }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -87,8 +88,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.validate.outputs.newVersion }}
-        release_name: Blazium Anko Extension v${{ steps.validate.outputs.newVersion }}
+        tag_name: ${{ needs.build.outputs.version }}
+        release_name: Blazium Anko Extension v${{ needs.build.outputs.version }}
         draft: false
         prerelease: false
-        files: dist/blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
+        files: dist/blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
