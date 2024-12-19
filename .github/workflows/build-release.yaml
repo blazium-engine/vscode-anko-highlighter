@@ -78,7 +78,7 @@ jobs:
     needs: get-latest-sha
     runs-on: windows-latest
     outputs:
-      version: ${{ needs.get-latest-sha.outputs.version_string }}
+      version: ${{ steps.update_version.outputs.version }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -95,6 +95,31 @@ jobs:
       run: |
         cd .\anko\
         npm install
+
+
+    - name: Update Package Version
+      id: update_version
+      run: |
+        # Ensure the working directory is correct
+        Set-Location -Path "${{ github.workspace }}"
+
+        # Load the package.json file
+        $packageJsonPath = "./anko/package.json"
+        if (-Not (Test-Path -Path $packageJsonPath)) {
+          Write-Error "package.json not found at $packageJsonPath."
+          exit 1
+        }
+
+        # Update the version field
+        $packageJson = Get-Content -Raw -Path $packageJsonPath | ConvertFrom-Json
+        $packageJson.version = "${{ needs.get-latest-sha.outputs.version_string }}"
+
+        # Save the updated package.json
+        $packageJson | ConvertTo-Json -Depth 10 | Set-Content -Path $packageJsonPath -Encoding utf8
+
+        # Log the update
+        Write-Host "Updated version to $($packageJson.version) in package.json."
+        echo "version=${{ needs.get-latest-sha.outputs.version_string }}" >> $ENV:GITHUB_OUTPUT
 
     - name: Build VSIX file
       run: |
