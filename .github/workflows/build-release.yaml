@@ -33,11 +33,11 @@ jobs:
       run: |
         $comment = "${{ github.event.head_commit.message }}"
         if ($comment -match "#major") {
-          echo "bumpType=major" >> $GITHUB_OUTPUT
+          echo "bumpType=major" >> $ENV:GITHUB_OUTPUT
         } elseif ($comment -match "#minor") {
-          echo "bumpType=minor" >> $GITHUB_OUTPUT
+          echo "bumpType=minor" >> $ENV:GITHUB_OUTPUT
         } else {
-          echo "bumpType=patch" >> $GITHUB_OUTPUT
+          echo "bumpType=patch" >> $ENV:GITHUB_OUTPUT
         }
 
     - name: Execute Update Script
@@ -46,20 +46,20 @@ jobs:
         $DebugInfo = @()
         $DebugInfo += "Executing update.ps1 with VersionType=${{ steps.version.outputs.bumpType }}"
         $result = pwsh ./scripts/update.ps1 ${{ steps.version.outputs.bumpType }}
-        echo "version=$result" >> $GITHUB_OUTPUT
-        echo "$DebugInfo" >> $GITHUB_STEP_SUMMARY
+        echo "version=$result" >> $ENV:GITHUB_OUTPUT
+        echo "$DebugInfo" >> $ENV:GITHUB_STEP_SUMMARY
       shell: pwsh
 
     - name: Validate Version Output
       id: validate
       run: |
         $version = "${{ steps.update.outputs.version }}"
-        echo "Validating version: $version" >> $GITHUB_STEP_SUMMARY
+        echo "Validating version: $version" >> $ENV:GITHUB_STEP_SUMMARY
         if ($version -notmatch "^\d+\.\d+\.\d+$") {
           Write-Error "Invalid version format: $version"
           exit 1
         }
-        echo "newVersion=$version" >> $GITHUB_OUTPUT
+        echo "newVersion=$version" >> $ENV:GITHUB_OUTPUT
 
     - name: Build VSIX file
       run: |
