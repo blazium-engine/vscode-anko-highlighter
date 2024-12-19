@@ -86,7 +86,8 @@ jobs:
         name: blazium-anko-extension-vsix
 
     - name: Create GitHub Release
-      uses: actions/create-release@v1
+      id: createRelease
+      uses: actions/create-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -94,4 +95,15 @@ jobs:
         release_name: Blazium Anko Extension v${{ needs.build.outputs.version }}
         draft: false
         prerelease: false
-        files: dist/blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.createRelease.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/dist/blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
+        asset_name: blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
+        asset_content_type: application/octet-stream
+
+    
