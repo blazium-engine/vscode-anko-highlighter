@@ -6,7 +6,9 @@ on:
       - main
       - master
   workflow_dispatch:
-
+env:
+  PUBLISHER_NAME: blazium-engine 
+  VSCE_PAT: ${{ env.VS_MARKETPLACE_PAT }}
 jobs:
   get-latest-sha:
     name: 🔍 Get Latest SHA & Base Version
@@ -141,6 +143,15 @@ jobs:
       contents: write  # Grants write permissions for content operations
 
     steps:
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install vsce
+      run: npm install -g @vscode/vsce
+
     - name: Download artifact
       uses: actions/download-artifact@v3
       with:
@@ -167,5 +178,11 @@ jobs:
         asset_path: ${{ github.workspace }}\dist\blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
         asset_name: blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
         asset_content_type: application/octet-stream
+
+    - name: Deploy to Visual Studio Marketplace
+      run: |
+        vsce verify-pat ${{ env.PUBLISHER_NAME }}
+        vsce login ${{ env.PUBLISHER_NAME }}
+        vsce publish --packagePath ${{ github.workspace }}\dist\blazium-anko-extension-${{ needs.get-latest-sha.outputs.version_string }}.vsix
 
     
