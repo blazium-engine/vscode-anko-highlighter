@@ -8,7 +8,74 @@ on:
   workflow_dispatch:
 
 jobs:
+  get-latest-sha:
+    name: 🔍 Get Latest SHA & Base Version
+    runs-on: ubuntu-latest
+    outputs:
+      version_string: ${{ steps.new_version.outputs.version_string }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: blazium-engine/vscode-anko-highlighter
+          ref: master
+          fetch-depth: 2
+
+      - name: Get Latest Commit SHA
+        id: get_sha
+        run: echo "sha=$(git rev-parse HEAD)" >> $ENV:GITHUB_OUTPUT
+
+      - name: Generate Changelog.json
+        id: new_version
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_OWNER: blazium-engine
+          GITHUB_REPO: vscode-anko-highlighter
+          BASE_BRANCH: 0acc2206c2a57f104d3295ec4e5b5ce7b7d9d4dd
+          CURRENT_BRANCH: ${{ steps.get_sha.outputs.sha }}
+          MAJOR_VERSION: 0
+          MINOR_VERSION: 0
+          PATCH_VERSION: 2
+        run: |
+          # Ensure the working directory is correct
+          Set-Location -Path "${{ github.workspace }}"
+
+          # Trigger the changelog generation script
+          node ./scripts/changelog.js $(Get-Location)
+
+          # Validate if changelog.json exists
+          if (-Not (Test-Path -Path "changelog.json")) {
+            Write-Error "changelog.json not found."
+            exit 1
+          }
+
+          # Parse changelog.json to extract version information
+          $changelog = Get-Content -Raw -Path "changelog.json" | ConvertFrom-Json
+          $major = $changelog.version.major
+          $minor = $changelog.version.minor
+          $patch = $changelog.version.patch
+
+          # Combine version variables into a single variable
+          $version = "$major.$minor.$patch"
+
+          # Set outputs
+          echo "version=$version" >> $ENV:GITHUB_OUTPUT
+
+          # Create a debug summary
+          $summary = @(
+            "# Version Information",
+            "- Major: $major",
+            "- Minor: $minor",
+            "- Patch: $patch",
+            "- Full Version: $version"
+          ) -join "`n"
+          echo $summary >> $ENV:GITHUB_STEP_SUMMARY
+
+
+
   build:
+    name: Building VSIX Package
+    needs: get-latest-sha
     runs-on: windows-latest
     outputs:
       version: ${{ steps.validate.outputs.newVersion }}
@@ -27,54 +94,21 @@ jobs:
     - name: Install dependencies
       run: |
         cd .\anko\
-        npm install
-
-    - name: Determine Version Bump
-      id: version
-      run: |
-        $comment = "${{ github.event.head_commit.message }}"
-        if ($comment -match "#major") {
-          echo "bumpType=major" >> $ENV:GITHUB_OUTPUT
-        } elseif ($comment -match "#minor") {
-          echo "bumpType=minor" >> $ENV:GITHUB_OUTPUT
-        } else {
-          echo "bumpType=patch" >> $ENV:GITHUB_OUTPUT
-        }
-
-    - name: Execute Update Script
-      id: update
-      run: |
-        $DebugInfo = @()
-        $DebugInfo += "Executing update.ps1 with VersionType=${{ steps.version.outputs.bumpType }}"
-        $result = pwsh ./scripts/update.ps1 ${{ steps.version.outputs.bumpType }}
-        echo "version=$result" >> $ENV:GITHUB_OUTPUT
-        echo "$DebugInfo" >> $ENV:GITHUB_STEP_SUMMARY
-      shell: pwsh
-
-    - name: Validate Version Output
-      id: validate
-      run: |
-        $version = "${{ steps.update.outputs.version }}"
-        echo "Validating version: $version" >> $ENV:GITHUB_STEP_SUMMARY
-        if ($version -notmatch "^\d+\.\d+\.\d+$") {
-          Write-Error "Invalid version format: $version"
-          exit 1
-        }
-        echo "newVersion=$version" >> $ENV:GITHUB_OUTPUT
+        npm Install
 
     - name: Build VSIX file
       run: |
         cd .\anko\
-        vsce package --allow-missing-repository --out ..\dist\blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
+        vsce package --allow-missing-repository --out ..\dist\blazium-anko-extension-${{ needs.get-latest-sha.outputs.version_string }}.vsix
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: blazium-anko-extension-vsix
-        path: dist/blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
+        path: dist/blazium-anko-extension-${{ needs.get-latest-sha.outputs.version_string }}.vsix
 
   release:
-    needs: build
+    needs: [ build, get-latest-sha ]
     runs-on: windows-latest
     permissions:
       contents: write  # Grants write permissions for content operations
@@ -91,8 +125,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ needs.build.outputs.version }}
-        release_name: Blazium Anko Extension v${{ needs.build.outputs.version }}
+        tag_name: ${{ needs.get-latest-sha.outputs.version_string }}
+        release_name: Blazium Anko Extension v${{ needs.get-latest-sha.outputs.version_string }}
         draft: false
         prerelease: false
 
@@ -102,8 +136,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.createRelease.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/dist/blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
-        asset_name: blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
+        asset_path: ${{ github.workspace }}/dist/blazium-anko-extension-${{ needs.get-latest-sha.outputs.version_string }}.vsix
+        asset_name: blazium-anko-extension-${{ needs.get-latest-sha.outputs.version_string }}.vsix
         asset_content_type: application/octet-stream
 
     
