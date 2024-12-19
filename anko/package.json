@@ -3,6 +3,7 @@
     "displayName":  "Blazium Anko",
     "description":  "Syntax highlighting for Blazium\u0027s Flavor of Anko",
     "publisher":  "blazium-engine",
+    "license": "SEE LICENSE IN LICENSE.md",
     "version":  "0.0.2",
     "engines":  {
                     "vscode":  "^1.92.0"
@@ -32,5 +33,16 @@
                                              "path":  "./syntaxes/blazium-anko.tmLanguage.json"
                                          }
                                      ]
-                    }
+                    },
+                    "repository": {
+                      "type": "git",
+                      "url": "https://github.com/blazium-engine/vscode-anko-highlighter.git"
+                    },
+                    "author": {
+                        "name": "Randolph William Aarseth II"
+                      },
+                      "bugs": {
+                        "url": "https://github.com/blazium-engine/vscode-anko-highlighter/issues"
+                      },
+  "homepage": "https://github.com/blazium-engine/vscode-anko-highlighter/blob/main/README.md"
 }
