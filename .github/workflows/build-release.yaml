@@ -10,7 +10,6 @@ on:
 
 env:
   PUBLISHER_NAME: blazium-engine 
-  VSCE_PAT: ${{ env.VS_MARKETPLACE_PAT }}
 
 concurrency:
   group: ci-anko-runner
@@ -187,6 +186,8 @@ jobs:
         asset_content_type: application/octet-stream
 
     - name: Deploy to Visual Studio Marketplace
+      env:
+        VSCE_PAT: ${{ secrets.VS_MARKETPLACE_PAT }}
       run: |
         vsce verify-pat ${{ env.PUBLISHER_NAME }}
         vsce login ${{ env.PUBLISHER_NAME }}
