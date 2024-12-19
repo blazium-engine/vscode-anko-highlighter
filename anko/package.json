@@ -1,0 +1,36 @@
+{
+    "name":  "anko",
+    "displayName":  "Blazium Anko",
+    "description":  "Syntax highlighting for Blazium\u0027s Flavor of Anko",
+    "publisher":  "blazium-engine",
+    "version":  "0.0.2",
+    "engines":  {
+                    "vscode":  "^1.92.0"
+                },
+    "categories":  [
+                       "Programming Languages"
+                   ],
+    "contributes":  {
+                        "languages":  [
+                                          {
+                                              "id":  "blazium-anko",
+                                              "aliases":  [
+                                                              "Blazium Anko",
+                                                              "blazium-anko"
+                                                          ],
+                                              "extensions":  [
+                                                                 ".anko",
+                                                                 ".blazium-anko"
+                                                             ],
+                                              "configuration":  "./language-configuration.json"
+                                          }
+                                      ],
+                        "grammars":  [
+                                         {
+                                             "language":  "blazium-anko",
+                                             "scopeName":  "source.anko",
+                                             "path":  "./syntaxes/blazium-anko.tmLanguage.json"
+                                         }
+                                     ]
+                    }
+}

@@ -1,0 +1,104 @@
+#!anko
+
+// Importing standard libraries
+fmt = import("fmt") // For printing to the console
+rand = import("math/rand") // For random number generation
+
+// Function: Demonstrates function definition
+func example_function() {
+    // Variables: Demonstrates variable declaration and assignment
+    greeting = "Hello, World!" // String variable
+    number = 42 // Integer variable
+    pi = 3.14 // Float variable
+    isAnkoFun = true // Boolean variable
+
+    fmt.Println(greeting) // Print a string
+    fmt.Println("The answer is:", number) // Print multiple values
+    fmt.Println("Value of pi:", pi)
+    fmt.Println("Is Anko fun?", isAnkoFun)
+}
+
+// Arrays: Demonstrates array usage
+func example_array() {
+    colors = ["Red", "Green", "Blue"] // Array of strings
+    for color in colors { // Looping through an array
+        fmt.Println("Color:", color)
+    }
+}
+
+// Maps: Demonstrates map usage
+func example_map() {
+    scores = { "Alice": 90, "Bob": 85 } // Map with string keys and integer values
+    fmt.Println("Alice's score:", scores["Alice"])
+
+    scores["Charlie"] = 95 // Adding a new key-value pair
+    for name, score in scores { // Iterating over a map
+        fmt.Println(name, "scored", score)
+    }
+}
+
+// Conditionals: Demonstrates if-else statements
+func example_conditionals(number) {
+    if number > 0 {
+        fmt.Println("The number is positive.")
+    } else if number < 0 {
+        fmt.Println("The number is negative.")
+    } else {
+        fmt.Println("The number is zero.")
+    }
+}
+
+// Loops: Demonstrates for loops
+func example_loops() {
+    for i = 1; i <= 5; i++ { // Simple for loop
+        fmt.Println("Number:", i)
+    }
+
+    // While loop using a for construct
+    counter = 0
+    for counter < 3 {
+        fmt.Println("Counter:", counter)
+        counter += 1
+    }
+}
+
+// Random Numbers: Demonstrates usage of the math/rand library
+func example_random() {
+    rand.Seed(42) // Seeding the random number generator
+    randomNum = rand.Intn(100) // Random number between 0 and 99
+    fmt.Println("Random number:", randomNum)
+}
+
+// Functions with parameters and return values
+func add_numbers(a, b) {
+    return a + b // Return the sum of two numbers
+}
+
+// Example of calling all the structures
+func main() {
+    fmt.Println("=== Variables ===")
+    example_function()
+
+    fmt.Println("=== Arrays ===")
+    example_array()
+
+    fmt.Println("=== Maps ===")
+    example_map()
+
+    fmt.Println("=== Conditionals ===")
+    example_conditionals(5)
+    example_conditionals(0)
+
+    fmt.Println("=== Loops ===")
+    example_loops()
+
+    fmt.Println("=== Random Numbers ===")
+    example_random()
+
+    fmt.Println("=== Function with Return ===")
+    result = add_numbers(10, 20)
+    fmt.Println("Sum of 10 and 20 is:", result)
+}
+
+// Call the main function
+main()

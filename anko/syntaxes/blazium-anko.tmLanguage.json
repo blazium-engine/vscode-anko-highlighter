@@ -1,0 +1,97 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Blazium Anko",
+    "patterns": [
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#variables"
+        },
+        {
+            "include": "#parentheses"
+        },
+        {
+            "include": "#functions"
+        },
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#shebang"
+        }
+    ],
+    "repository": {
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.blazium-anko",
+                    "match": "\\b(if|while|for|return|func)\\b"
+                }
+            ]
+        },
+        "strings": {
+            "name": "string.quoted.double.blazium-anko",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.blazium-anko",
+                    "match": "\\\\."
+                }
+            ]
+        },
+        "variables": {
+            "patterns": [
+                {
+                    "name": "variable.other.blazium-anko",
+                    "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+                }
+            ]
+        },
+        "parentheses": {
+            "patterns": [
+                {
+                    "name": "punctuation.definition.parentheses.blazium-anko",
+                    "match": "[\\(\\)]"
+                }
+            ]
+        },
+        "functions": {
+            "patterns": [
+                {
+                    "name": "entity.name.function.blazium-anko",
+                    "match": "\\b(func)\\s+[a-zA-Z_][a-zA-Z0-9_]*"
+                }
+            ]
+        },
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line.double-slash.blazium-anko",
+                    "begin": "//",
+                    "end": "(?=\\n)",
+                    "patterns": []
+                },
+                {
+                    "name": "comment.block.blazium-anko",
+                    "begin": "/\\*",
+                    "end": "\\*/",
+                    "patterns": []
+                }
+            ]
+        },
+        "shebang": {
+            "patterns": [
+                {
+                    "name": "comment.line.shebang.blazium-anko",
+                    "match": "^#!anko|^#!blazium-anko"
+                }
+            ]
+        }
+    },
+    "scopeName": "source.anko"
+}

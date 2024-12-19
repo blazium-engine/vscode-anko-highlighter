@@ -1,0 +1,58 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Package Anko Extension",
+            "type": "shell",
+            "command": "vsce",
+            "args": [
+                "package",
+                "--allow-missing-repository",
+                "--out",
+                "${workspaceFolder}/dist/blazium-anko-extension-0.1.0.vsix"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/anko"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Packages the Anko extension into a .vsix file and places it in the 'dist' folder."
+        },
+        {
+            "label": "Install Anko Extension",
+            "type": "shell",
+            "command": "code",
+            "args": [
+                "--install-extension",
+                "${workspaceFolder}/dist/blazium-anko-extension-0.1.0.vsix"
+            ],
+            "problemMatcher": [],
+            "detail": "Installs the packaged Anko extension from the 'dist' folder."
+        },
+        {
+            "label": "Reload Anko Extension",
+            "type": "shell",
+            "command": "code",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/anko",
+                "--disable-extensions"
+            ],
+            "problemMatcher": [],
+            "detail": "Reloads the Anko extension for development."
+        },
+        {
+            "label": "Uninstall Anko Extension",
+            "type": "shell",
+            "command": "code",
+            "args": [
+                "--uninstall-extension",
+                "blazium-engine.anko"
+            ],
+            "problemMatcher": [],
+            "detail": "Uninstalls the Anko extension from VS Code."
+        }
+    ]
+}

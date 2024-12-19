@@ -1,0 +1,90 @@
+name: Build and Release VSIX
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install vsce
+      run: npm install -g @vscode/vsce
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Determine Version Bump
+      id: version
+      run: |
+        $comment = "${{ github.event.head_commit.message }}"
+        if ($comment -match "#major") {
+          echo "bumpType=major" >> $GITHUB_OUTPUT
+        } elseif ($comment -match "#minor") {
+          echo "bumpType=minor" >> $GITHUB_OUTPUT
+        } else {
+          echo "bumpType=patch" >> $GITHUB_OUTPUT
+        }
+
+    - name: Execute Update Script
+      id: update
+      run: |
+        $DebugInfo = @()
+        $DebugInfo += "Executing update.ps1 with VersionType=${{ steps.version.outputs.bumpType }}"
+        $result = pwsh ./scripts/update.ps1 -VersionType ${{ steps.version.outputs.bumpType }}
+        echo "version=$result" >> $GITHUB_OUTPUT
+        echo "$DebugInfo" >> $GITHUB_STEP_SUMMARY
+      shell: pwsh
+
+    - name: Validate Version Output
+      id: validate
+      run: |
+        $version = "${{ steps.update.outputs.version }}"
+        echo "Validating version: $version" >> $GITHUB_STEP_SUMMARY
+        if ($version -notmatch "^\d+\.\d+\.\d+$") {
+          Write-Error "Invalid version format: $version"
+          exit 1
+        }
+        echo "newVersion=$version" >> $GITHUB_OUTPUT
+
+    - name: Build VSIX file
+      run: |
+        vsce package --out dist/blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: blazium-anko-extension-vsix
+        path: dist/blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
+
+  release:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: blazium-anko-extension-vsix
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.validate.outputs.newVersion }}
+        release_name: Blazium Anko Extension v${{ steps.validate.outputs.newVersion }}
+        draft: false
+        prerelease: false
+        files: dist/blazium-anko-extension-${{ steps.validate.outputs.newVersion }}.vsix
