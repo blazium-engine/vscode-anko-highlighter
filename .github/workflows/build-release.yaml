@@ -45,7 +45,7 @@ jobs:
       run: |
         $DebugInfo = @()
         $DebugInfo += "Executing update.ps1 with VersionType=${{ steps.version.outputs.bumpType }}"
-        $result = pwsh ./scripts/update.ps1 -VersionType ${{ steps.version.outputs.bumpType }}
+        $result = pwsh ./scripts/update.ps1 ${{ steps.version.outputs.bumpType }}
         echo "version=$result" >> $GITHUB_OUTPUT
         echo "$DebugInfo" >> $GITHUB_STEP_SUMMARY
       shell: pwsh
