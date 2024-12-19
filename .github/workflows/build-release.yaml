@@ -94,7 +94,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd .\anko\
-        npm Install
+        npm install
 
     - name: Build VSIX file
       run: |
