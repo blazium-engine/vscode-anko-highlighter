@@ -1,14 +1,21 @@
 name: Build and Release VSIX
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - master
-  workflow_dispatch:
+
+
 env:
   PUBLISHER_NAME: blazium-engine 
   VSCE_PAT: ${{ env.VS_MARKETPLACE_PAT }}
+
+concurrency:
+  group: ci-anko-runner
+  cancel-in-progress: true
+
 jobs:
   get-latest-sha:
     name: 🔍 Get Latest SHA & Base Version
