@@ -10,7 +10,7 @@ on:
 jobs:
   get-latest-sha:
     name: 🔍 Get Latest SHA & Base Version
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     outputs:
       version_string: ${{ steps.new_version.outputs.version_string }}
     steps:
