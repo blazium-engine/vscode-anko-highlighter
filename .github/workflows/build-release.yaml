@@ -191,6 +191,6 @@ jobs:
       run: |
         vsce verify-pat ${{ env.PUBLISHER_NAME }}
         vsce login ${{ env.PUBLISHER_NAME }}
-        vsce publish --packagePath ${{ github.workspace }}\dist\blazium-anko-extension-${{ needs.get-latest-sha.outputs.version_string }}.vsix
+        vsce publish --packagePath ${{ github.workspace }}\dist\blazium-anko-extension-${{ needs.build.outputs.version }}.vsix
 
     
